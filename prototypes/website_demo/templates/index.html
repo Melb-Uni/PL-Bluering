@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>demo</title>
+    <script src="../static/js/index.js"></script>
+    <script src="../static/js/lib/vue.min.js"></script>
+    <script src="../static/js/lib/pixi.min.js"></script>
+    <link rel="stylesheet" href="../static/css/index.css">
+    <script src="../static/js/lib/axios.min.js"></script>
+</head>
+<body>
+<div id = "app">
+    <div class="title">This is the header</div>
+    <div id="pixi" >  </div>
+    <div id="testValue" v-text="value">
+        {{value}}
+    </div>
+</div>
+Hello there
+<script>
+
+    var vm = new Vue({
+        el: '#app',
+        data:{
+            value:10,
+            v_appWi:600,
+            v_appHi:400
+        },
+        mounted(){
+            this.init_pixi();
+        },
+        methods:{
+            init_pixi() {
+
+                var that = this;
+                const app = new PIXI.Application({ width: that.v_appWi,
+                    height: that.v_appHi,antialias: true,transparent: false,
+                    resolution: 1});
+                document.getElementById("pixi").appendChild(app.view);
+                const loader = new PIXI.Loader();
+                loader.add("../static/images/dog.jpeg").load(setup);
+
+                function setup() {
+
+
+                    let pic = new PIXI.Sprite(loader.resources["../static/images/dog.jpeg"].texture);
+
+                    //Add the cat to the stage
+                    app.stage.addChild(pic);
+
+                    //If you ever need to, here's how you can clean out WebGL's GPU
+                    //memory manually
+                    /*
+                    Object.keys(TextureCache).forEach(function(texture) {
+                      TextureCache[texture].destroy(true);
+                    });
+                    */
+                }
+
+                // app.renderer.view.style.border = "1px dashed black";
+                // app.renderer.backgroundColor = 0x061639;
+            },
+            test_axios_get:function(){
+                axios.get('/user', {
+                    params: {
+                        ID: 12345
+                    }
+                })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
+                // similar to the one above
+                // axios.get('/user?ID=12345')
+                //     .then(function (response) {
+                //         console.log(response);
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
+            },
+            test_axios_post:function(){
+                axios.post('/user', {
+                    firstName: 'aaa',
+                    lastName: 'bbb'
+                })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+
+        }
+    })
+</script>
+
+</body>
+
+
+</html>
