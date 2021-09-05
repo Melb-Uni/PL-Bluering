@@ -14,19 +14,90 @@
 </head>
 <body>
 <div id = "app">
-    <div class="title">This is the header</div>
+    <el-container>
+        <el-header>Build Visualisation From Problem</el-header>
+        <el-main>
+            <div>OPTION 1-PLANNER URL </div>
+            <el-row>
+                <el-col :span="3"><div >Enter URL：</div></el-col>
+                <el-col :span="18">
+                    <el-input v-model="input" placeholder="please input the url"></el-input>
+                </el-col>
+            </el-row>
 
-    <div id="pixi" style="position: relative;display: flex">  </div>
+<!--            <div id="testValue" v-text="value">-->
+<!--                {{value}}-->
+<!--            </div>-->
+            <div>OPTION 1-Upload PROBLEM, DOMAIN and ANIMATION PROFILE files </div>
+            <el-row>
+                <el-col :span="8"><div >Domain File</div></el-col>
+                <el-col :span="8">
+                    <div >Problem File</div>
+                </el-col>
+                <el-col :span="8">
+                    <div >Animation Profile</div>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="8">
+                    <el-upload
+                            class="upload-demo"
+                            drag
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            multiple>
+                        <i class="el-icon-upload"></i>
+                        <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
+                        <div class="el-upload__tip" slot="tip">DOMAIN.PDDL</div>
+                    </el-upload>
+                </el-col>
+                <el-col :span="8">
+                    <el-upload
+                            class="upload-demo"
+                            drag
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            multiple>
+                        <i class="el-icon-upload"></i>
+                        <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
+                        <div class="el-upload__tip" slot="tip">PROBLEM.PDDL</div>
+                    </el-upload>
+                </el-col>
+                <el-col :span="8">
+                    <el-upload
+                            class="upload-demo"
+                            drag
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            multiple>
+                        <i class="el-icon-upload"></i>
+                        <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
+                        <div class="el-upload__tip" slot="tip">ANIMATION.PDDL</div>
+                    </el-upload>
+                </el-col>
+            </el-row>
+        </el-main>
+        <el-header>Build Visualisation From solution VFG</el-header>
+        <el-main>
+            <div>SELECT VFG FILE TO GENERATE VISUALISATION DIRECTLY.</div>
+            <el-upload
+                    class="upload-demo"
+                    drag
+                    action="https://jsonplaceholder.typicode.com/posts/"
+                    multiple>
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
+                <div class="el-upload__tip" slot="tip">VFG(.vfg) file</div>
+            </el-upload>
+            <div id="pixi" style="position: relative;display: flex">  </div>
+        </el-main>
+    </el-container>
 
-    <div id="testValue" v-text="value">
-        {{value}}
-    </div>
+
 </div>
 <script>
 
     var vm = new Vue({
         el: '#app',
         data:{
+            input:'',
             value:10,
             v_appWi:600,
             v_appHi:400
