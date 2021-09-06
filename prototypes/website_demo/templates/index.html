@@ -44,6 +44,7 @@
                             class="upload-demo"
                             drag
                             action="https://jsonplaceholder.typicode.com/posts/"
+                            :before-upload="beforeUploadPDDL"
                             multiple>
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
@@ -55,6 +56,7 @@
                             class="upload-demo"
                             drag
                             action="https://jsonplaceholder.typicode.com/posts/"
+                            :before-upload="beforeUploadPDDL"
                             multiple>
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
@@ -66,6 +68,7 @@
                             class="upload-demo"
                             drag
                             action="https://jsonplaceholder.typicode.com/posts/"
+                            :before-upload="beforeUploadPDDL"
                             multiple>
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
@@ -240,6 +243,14 @@
                     .catch(function (error) {
                         console.log(error);
                     });
+            },
+            beforeUploadPDDL(file) {
+                const isPDDL = file.type === 'pddl';
+
+                if (!isPDDL) {
+                    this.$message.error('the file need to be in PDDL type!');
+                }
+                return isPDDL;
             }
 
         }
