@@ -21,14 +21,14 @@
             <el-row>
                 <el-col :span="3"><div >Enter URL：</div></el-col>
                 <el-col :span="18">
-                    <el-input v-model="input" placeholder="please input the url"></el-input>
+                    <el-input v-model="plannerURL" placeholder="please input the url"></el-input>
                 </el-col>
             </el-row>
 
 <!--            <div id="testValue" v-text="value">-->
 <!--                {{value}}-->
 <!--            </div>-->
-            <div>OPTION 1-Upload PROBLEM, DOMAIN and ANIMATION PROFILE files </div>
+            <div>OPTION 2-Upload PROBLEM, DOMAIN and ANIMATION PROFILE files </div>
             <el-row>
                 <el-col :span="8"><div >Domain File</div></el-col>
                 <el-col :span="8">
@@ -43,9 +43,11 @@
                     <el-upload
                             class="upload-demo"
                             drag
-                            action="https://jsonplaceholder.typicode.com/posts/"
-                            :before-upload="beforeUploadPDDL"
-                            multiple>
+                            action=""
+                            :on-change="(file, fileList) => {handleChange(file, fileList, 'domain')}"
+                            :auto-upload = "false"
+                            :file-list="fileList"
+                            limit="1">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
                         <div class="el-upload__tip" slot="tip">DOMAIN.PDDL</div>
@@ -55,9 +57,10 @@
                     <el-upload
                             class="upload-demo"
                             drag
-                            action="https://jsonplaceholder.typicode.com/posts/"
-                            :before-upload="beforeUploadPDDL"
-                            multiple>
+                            action=""
+                            :on-change="(file, fileList) => {handleChange(file, fileList, 'problem')}"
+                            :file-list="fileList"
+                            :auto-upload = "false">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
                         <div class="el-upload__tip" slot="tip">PROBLEM.PDDL</div>
@@ -67,15 +70,17 @@
                     <el-upload
                             class="upload-demo"
                             drag
-                            action="https://jsonplaceholder.typicode.com/posts/"
-                            :before-upload="beforeUploadPDDL"
-                            multiple>
+                            action=""
+                            :on-change="(file, fileList) => {handleChange(file, fileList, 'anim')}"
+                            :file-list="fileList"
+                            :auto-upload = "false">
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
                         <div class="el-upload__tip" slot="tip">ANIMATION.PDDL</div>
                     </el-upload>
                 </el-col>
             </el-row>
+            <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">continue</el-button>
         </el-main>
         <el-header>Build Visualisation From solution VFG</el-header>
         <el-main>
@@ -83,8 +88,10 @@
             <el-upload
                     class="upload-demo"
                     drag
-                    action="https://jsonplaceholder.typicode.com/posts/"
-                    multiple>
+                    action=""
+                    :on-change="(file, fileList) => {handleChange(file, fileList, 'domain')}"
+                    :file-list="fileList"
+                    :auto-upload = "false">
                 <i class="el-icon-upload"></i>
                 <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
                 <div class="el-upload__tip" slot="tip">VFG(.vfg) file</div>
@@ -100,10 +107,12 @@
     var vm = new Vue({
         el: '#app',
         data:{
-            input:'',
+            plannerURL:"http://solver.planning.domains/solve",
             value:10,
             v_appWi:600,
-            v_appHi:400
+            v_appHi:400,
+            pddlForm:{"domain": "","problem":"","anim":""},
+            fileList:[]
         },
         mounted(){
             this.init_pixi();
@@ -210,6 +219,28 @@
                 // app.renderer.view.style.border = "1px dashed black";
                 // app.renderer.backgroundColor = 0x061639;
             },
+            submitUpload:function(){
+                let data = new FormData();
+                data.append("domain", this.pddlForm["domain"]);
+                data.append("problem",this.pddlForm["problem"]);
+                data.append("animation",this.pddlForm["anim"]);
+                data.append("plan", "");
+                data.append("url",this.plannerURL);
+
+                axios({
+                    method:'post',
+                    url:'https://planimation.planning.domains/upload/pddl',
+                    data: data,
+                    headers:{
+                    'Content-Type': 'multipart/form-data'
+                    }
+                    }).then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
             test_axios_get:function(){
                 axios.get('/user', {
                     params: {
@@ -243,6 +274,14 @@
                     .catch(function (error) {
                         console.log(error);
                     });
+            },
+            handleChange(file,fileList,mode) {
+                let reader = new FileReader()
+                reader.readAsText(file.raw)
+                reader.onload =  (e) =>{
+                    const fileString = e.target.result;
+                    this.pddlForm[mode] = fileString;
+                }
             },
             beforeUploadPDDL(file) {
                 const isPDDL = file.type === 'pddl';

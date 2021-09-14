@@ -4,8 +4,8 @@ import re
 import json
 
 # To be changed once deployed on actural server
-pddl_url = "http://127.0.0.1:8000/upload/(?P<filename>[^/]+)$"
-vfg_url = "http://127.0.0.1:8000/downloadVisualisation"
+pddl_url = "https://immense-bastion-42146.herokuapp.com/upload/(?P<filename>[^/]+)$"
+vfg_url = "https://immense-bastion-42146.herokuapp.com/downloadVisualisation"
 
 # check if the input file is in the correct format using regex
 def check_input(filename, format):
@@ -37,6 +37,7 @@ def pddl_visualise(domain_file, problem_file, animation_profile, output_format):
     files = ("domain", (None, domain)), ("problem", (None, problem)), ("animation", (None, animation)), \
             ("fileType", (None, output_format))
     print("Waiting for response...")
+
     r = requests.post(pddl_url, files=files)
     if "message" in r.text:
         message = json.loads(r.text)

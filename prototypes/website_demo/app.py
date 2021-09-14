@@ -28,7 +28,11 @@ def getuser():
         lastName = request.json.get('lastName')
         return "post method result: " + firstName +" "+ lastName
 
+@app.route("/upload",methods=["POST"])
+def uploadPDDL():
+    print(request.json.get('domain'))
 
+    return "post method result:"
 
 if __name__ == '__main__':
     app.run()
