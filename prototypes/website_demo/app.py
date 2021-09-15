@@ -1,7 +1,6 @@
 from flask import  *
 
 import time
-import planimation_api as api
 
 app = Flask(__name__)
 
