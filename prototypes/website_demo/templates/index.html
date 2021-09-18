@@ -162,11 +162,18 @@
 
                 const aliens = [];
 
+                var image = new Image()
+                image.src = "data:image/png;base64,"+that.responseEvent["imageTable"]["m_values"][0]
+                const base = new PIXI.BaseTexture(image);
+                const texture = new PIXI.Texture(base);
+                const sprite = new PIXI.Sprite(texture);
+
                 const totalDudes = 5;
 
                 for (let i = 0; i < totalDudes; i++) {
                     // create a new Sprite that uses the image name that we just generated as its source
                     const dude = PIXI.Sprite.from('../static/images/dog.jpeg');
+
 
                     // set the anchor point so the texture is centered on the sprite
                     dude.anchor.set(0.5);
