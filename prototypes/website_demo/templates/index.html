@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="../static/css/index.css">
     <script src="../static/js/lib/axios.min.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TweenMax.min.js'></script>
+    <script src="https://www.kkkk1000.com/js/tink.js"></script>
+    <script src="https://www.kkkk1000.com/js/spriteUtilities.js"></script>
+
 </head>
 <body>
 <div id = "app">
@@ -109,8 +113,6 @@
         </div>
 
     </el-container>
-
-
 </div>
 <script>
     var vm = new Vue({
@@ -126,121 +128,13 @@
             responseEvent:{}
         },
         mounted(){
+            //this.test_render();
             //this.init_pixi();
+            //this.setup_Sprite_test();
         },
+        
         methods:{
-            init_pixi() {
-
-                var that = this;
-                // const app = new PIXI.Application({ width: that.v_appWi,
-                //     height: that.v_appHi,antialias: true,transparent: false,
-                //     resolution: 1});
-                //
-                // document.getElementById("pixi").appendChild(app.view);
-                //
-                // const loader = new PIXI.Loader();
-                // loader.add("../static/images/dog.jpeg").load(setup);
-                //
-                // function setup() {
-                //
-                //     let pic = new PIXI.Sprite(loader.resources["../static/images/dog.jpeg"].texture);
-                //
-                //     //Add the cat to the stage
-                //     app.stage.addChild(pic);
-                //
-                //     //If you ever need to, here's how you can clean out WebGL's GPU
-                //     //memory manually
-                //     /*
-                //     Object.keys(TextureCache).forEach(function(texture) {
-                //       TextureCache[texture].destroy(true);
-                //     });
-                //     */
-                // }
-
-                const app = new PIXI.Application();
-                document.body.appendChild(app.view);
-
-                const aliens = [];
-
-                var image = new Image()
-                image.src = "data:image/png;base64,"+that.responseEvent["imageTable"]["m_values"][0]
-                const base = new PIXI.BaseTexture(image);
-                const texture = new PIXI.Texture(base);
-                const sprite = new PIXI.Sprite(texture);
-
-                const totalDudes = 5;
-
-                for (let i = 0; i < totalDudes; i++) {
-                    // create a new Sprite that uses the image name that we just generated as its source
-                    const dude = PIXI.Sprite.from('../static/images/dog.jpeg');
-
-
-                    // set the anchor point so the texture is centered on the sprite
-                    dude.anchor.set(0.5);
-
-                    // set a random scale for the dude - no point them all being the same size!
-                    dude.scale.set(0.8 + Math.random() * 0.3);
-
-                    // finally lets set the dude to be at a random position..
-                    dude.x = Math.random() * app.screen.width;
-                    dude.y = Math.random() * app.screen.height;
-
-                    dude.tint = Math.random() * 0xFFFFFF;
-
-                    // create some extra properties that will control movement :
-                    // create a random direction in radians. This is a number between 0 and PI*2 which is the equivalent of 0 - 360 degrees
-                    dude.direction = Math.random() * Math.PI * 2;
-
-                    // this number will be used to modify the direction of the dude over time
-                    dude.turningSpeed = Math.random() - 0.8;
-
-                    // create a random speed for the dude between 2 - 4
-                    dude.speed = 2 + Math.random() * 2;
-
-                    // finally we push the dude into the aliens array so it it can be easily accessed later
-                    aliens.push(dude);
-
-                    app.stage.addChild(dude);
-                }
-
-                // create a bounding box for the little dudes
-                const dudeBoundsPadding = 100;
-                const dudeBounds = new PIXI.Rectangle(-dudeBoundsPadding,
-                    -dudeBoundsPadding,
-                    app.screen.width + dudeBoundsPadding * 2,
-                    app.screen.height + dudeBoundsPadding * 2);
-
-                app.ticker.add(() => {
-                    // iterate through the dudes and update their position
-                    for (let i = 0; i < aliens.length; i++) {
-                        const dude = aliens[i];
-                        dude.direction += dude.turningSpeed * 0.01;
-                        dude.x += Math.sin(dude.direction) * dude.speed;
-                        dude.y += Math.cos(dude.direction) * dude.speed;
-                        dude.rotation = -dude.direction - Math.PI / 2;
-
-                        // wrap the dudes by testing their bounds...
-                        if (dude.x < dudeBounds.x) {
-                            dude.x += dudeBounds.width;
-                        } else if (dude.x > dudeBounds.x + dudeBounds.width) {
-                            dude.x -= dudeBounds.width;
-                        }
-
-                        if (dude.y < dudeBounds.y) {
-                            dude.y += dudeBounds.height;
-                        } else if (dude.y > dudeBounds.y + dudeBounds.height) {
-                            dude.y -= dudeBounds.height;
-                        }
-                    }
-                });
-
-                // app.renderer.view.style.border = "1px dashed black";
-                // app.renderer.backgroundColor = 0x061639;
-            },
-            test_render :function(){
-                this.renderAnim = !this.renderAnim;
-                this.init_pixi()
-            },
+            // 1. submit directly link to the click and response the PixiJS UI
             submitUpload:function(){
                 var that = this;
                 let data = new FormData();
@@ -258,14 +152,909 @@
                     'Content-Type': 'multipart/form-data'
                     }
                     }).then(function (response) {
-                        console.log(response);
-                        that.responseEvent = response["data"]
-
+                        console.log(response['data']);
+                        that.responseEvent = response
+                        console.log("success extract data from response") 
+                        //console.log(that.responseEvent['data'])
+                        that.test_render();
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
             },
+            
+            // 2. function test_render will stop render the initial page and show the canvas
+            test_render :function(){
+                this.renderAnim = !this.renderAnim;
+                this.init_pixi()
+            },
+            
+            // 3. function setup_render (optional)
+            setup_render(){
+                var that = this;
+                // const let var 
+                // let windowHeight = window.innerHeight;
+                // let windowWidth = window.innerWidth;
+                var windowHeight = window.innerHeight, windowWidth = window.innerWidth;
+                console.log(windowWidth, windowHeight)
+
+                // renderer detected
+                let type = "WebGL"
+                if(!PIXI.utils.isWebGLSupported()){
+                    type = "canvas"
+                }
+                PIXI.utils.sayHello(type)
+            
+                var pixiRender = new PIXI.autoDetectRenderer(windowWidth, windowHeight);
+                document.body.appendChild(pixiRender.view);
+                var objPixiContainer = new PIXI.Container();
+                pixiRender.render(objPixiContainer);
+            },
+            
+            // 4. functioon init_pixi mainly contains the PixiJS functions 
+            init_pixi() {    
+
+                var that = this;
+                // const let var 
+                // let windowHeight = window.innerHeight;
+                // let windowWidth = window.innerWidth;
+                var windowHeight = window.innerHeight, windowWidth = window.innerWidth;
+                console.log(windowWidth, windowHeight)
+
+                // renderer detected
+                let type = "WebGL"
+                if(!PIXI.utils.isWebGLSupported()){
+                    type = "canvas"
+                }
+                PIXI.utils.sayHello(type)
+
+                // var pixiRender = new PIXI.autoDetectRenderer(windowWidth, windowHeight);
+                // document.body.appendChild(pixiRender.view);
+                // var objPixiContainer = new PIXI.Container();
+                // pixiRender.render(objPixiContainer);
+
+                let app = new PIXI.Application({
+                    width: windowWidth,         // default: 800
+                    height: windowHeight,        // default: 600
+                    antialias: true,    // default: false
+                    transparent: false, // default: false
+                    resolution: 1,    // default: 1width: 256, height: 256c
+                    backgroundColor: 0xFFFFFF,
+                    roundPixels: true
+                });
+                document.body.appendChild(app.view);
+
+                // extract json data
+                
+                var imgTable_m_k = that.responseEvent['data']['imageTable']['m_key']
+                var imgTable_m_v = that.responseEvent['data']['imageTable']['m_values']
+
+                var message = null
+
+                var subGMap_m_k  = that.responseEvent['data']['subgoalMap']['m_key']
+                var subGMap_m_v  = that.responseEvent['data']['subgoalMap']['m_values']
+
+                var subGPool_m_k = that.responseEvent['data']['subgoalPool']['m_key']
+                var subGPool_m_v = that.responseEvent['data']['subgoalPool']['m_values']
+
+                var transferType = 1
+                
+                var visualStages = that.responseEvent['data']['visualStages']
+
+                // var img = new Image()
+                // img.src = "data:image/png;base64," + that.responseEvent['data']["imageTable"]["m_values"][0]
+                // const base = new PIXI.BaseTexture(img);
+                // const texture = new PIXI.Texture(base);
+                // const sprite = new PIXI.Sprite(texture);
+
+                // var ww, wh = windowWidth, windowHeight
+                // var posX = visualStages['0']['visualSprites']['0']['minX']
+                // var posY = visualStages['0']['visualSprites']['0']['minY']
+                // var position = ( ww * (posX + 0.1618 + 0.15), wh * (posY + 0.1 + 0.15))
+
+
+                // var img = new Image()
+                // var img_dir = new Array()
+                // img.src = "data:image/png;base64," + that.responseEvent['data']["imageTable"]["m_values"][0]
+                // const base = new PIXI.BaseTexture(img);
+                // const texture = new PIXI.Texture(base);
+                // const sprite = new PIXI.Sprite(texture);
+
+                var ww, wh = windowWidth, windowHeight
+                var posX = ww * (0.1618+0.15)
+                var posY = wh * (0.1+0.15)
+                var position_x = new Array()
+                var position_y = new Array()
+
+                //for( var i = 0; i < visualStages.length; i++){
+           
+
+
+
+
+                // var images_dir = 
+                //     ["images/alphabet_block/block_a.png", "images/alphabet_block/block_b.png", "images/alphabet_block/block_c.png", 
+                //     "images/alphabet_block/block_d.png", "images/alphabet_block/block_e.png", "images/alphabet_block/block_f.png",
+                //     "images/alphabet_block/block_g.png", "images/alphabet_block/block_h.png", "images/alphabet_block/block_i.png",
+                //     "images/vectorgraph/icons7_picker.png", "images/vectorgraph/icons11_line.png", 
+                //     "images/vectorgraph/icons11_line_black.png","images/vectorgraph/icons11_line_143_gray.png"]
+                //for()
+                PIXI.loader
+                    //.add(images_dir)
+                    
+                    //.add("images/button.png")
+                    //.add(img.src)
+                    //.add(imgTable_m_v)
+                    //.on("progress", loadProgressHandler)
+                    .load(setup_world)
+                    .load(setup_Sprite_test);
+                
+
+                
+
+
+                // function loadProgressHandler 
+                function loadProgressHandler(loader, resource){
+                    console.log("loading: " + resource.url);
+                    console.log("progress: " + loader.progress + "%");
+                }
+                // function setup for initialize the background frame 
+                function setup_world(){
+
+                    // root container
+                    var container = new PIXI.Container();
+                    app.stage.addChild(container)
+
+                    //将舞台加入dom（canvas dom元素的尺寸，按照屏幕宽高设置【自适应设置 2】）
+                    // app.view.style.width = windowWidth + 'px';
+                    // app.view.style.height = windowHeight + 'px';
+                    
+                    //  From the original UNITY design
+                    //
+                    //  ---------------------------------------------------------------------------
+                    //  pixi_header: Planimation       button(showgoal, download, question, return)
+                    //  ---------------------------------------------------------------------------
+                    //  pixi_body:              STEPS (MENU) |  PIXI  | SUBGOAL
+                    //                                       |  SHOW  | DISPLAY
+                    //                          STEPS INFO   |        |
+                    //                                       | CONSOLE| 
+                    //  ---------------------------------------------------------------------------
+                    //  pixi_footer: NULL
+                    //  ---------------------------------------------------------------------------
+
+                    //-------------------------------------------------------------------------------------------------------
+                    // header contains: header and planimation text
+                    //-------------------------------------------------------------------------------------------------------
+                    var pixi_header = new PIXI.Graphics();
+                    pixi_header.lineStyle(4, 0x093A7C, 1);
+                    pixi_header.beginFill(0x093A7C);
+                    pixi_header.drawRect(0, 0, windowWidth, windowHeight*0.1);
+                    pixi_header.endFill();
+                    pixi_header.x = 0;
+                    pixi_header.y = 0;
+                    app.stage.addChild(pixi_header);
+
+                    var style = {
+                        fontFamily: 'Arial',
+                        fontSize: windowHeight/16,
+                        fontStyle: 'italic',
+                        fontWeight: 'bold',
+                        fill: '#FFFFFF',
+                        stroke: '#093A7C',
+                        strokeThickness: 5,
+                        wordWrap: false
+                    };  
+
+                    var richText = new PIXI.Text('Planimation', style);
+                    richText.x = windowWidth*0.015;
+                    richText.y = windowHeight*0.015;
+                    app.stage.addChild(richText);
+                    //-------------------------------------------------------------------------------------------------------
+                    // body contains:
+                    //
+                    // steps and steps info
+                    // here contains 4 parts 
+
+                    //-------------------------------------------------------------------------------------------------------
+                    // steps title and the text
+                    //-------------------------------------------------------------------------------------------------------
+                    var pixi_steps_title = new PIXI.Graphics();
+                    pixi_steps_title.lineStyle(4, 0x093A7C, 1);
+                    pixi_steps_title.beginFill(0x8F8F8F);
+                    pixi_steps_title.drawRect(0, windowHeight*0.1, windowWidth*0.1618, windowHeight*0.15);
+                    pixi_steps_title.endFill();
+                    pixi_steps_title.x = 0;
+                    pixi_steps_title.Y = 0;
+                    app.stage.addChild(pixi_steps_title);
+
+                    var style = {
+                        fontFamily: 'Arial',
+                        fontSize: windowHeight/32,
+                        fontStyle: 'italic',
+                        fontWeight: 'bold',
+                        fill: '#FFFFFF',
+                        stroke: '#093A7C',
+                        strokeThickness: 5,
+                        wordWrap: false
+                    };  
+
+                    var richText = new PIXI.Text('Steps', style);
+                    richText.x = windowWidth*0.055;
+                    richText.y = windowHeight*0.105;
+                    app.stage.addChild(richText);
+
+                    var pixi_steps_menu = new PIXI.Graphics();
+                    pixi_steps_menu.lineStyle(4, 0x093A7C, 1);
+                    pixi_steps_menu.beginFill(0xFFFFFF);
+                    pixi_steps_menu.drawRect(0, windowHeight*0.15, windowWidth*0.1618, windowHeight*0.5);
+                    pixi_steps_menu.endFill();
+                    pixi_steps_menu.x = 0;
+                    pixi_steps_menu.Y = 0;
+                    app.stage.addChild(pixi_steps_menu);
+
+                    //-------------------------------------------------------------------------------------------------------
+                    // steps info title and steps info content
+                    //-------------------------------------------------------------------------------------------------------
+                    var pixi_steps_info_title = new PIXI.Graphics();
+                    pixi_steps_info_title.lineStyle(4, 0x093A7C, 1);
+                    pixi_steps_info_title.beginFill(0x8F8F8F);
+                    pixi_steps_info_title.drawRect(0, windowHeight*0.5, windowWidth*0.1618, windowHeight*0.55);
+                    pixi_steps_info_title.endFill();
+                    pixi_steps_info_title.x = 0;
+                    pixi_steps_info_title.Y = 0;
+                    app.stage.addChild(pixi_steps_info_title);
+
+                    var style = {
+                        fontFamily: 'Arial',
+                        fontSize: windowHeight/32,
+                        fontStyle: 'italic',
+                        fontWeight: 'bold',
+                        fill: '#FFFFFF',
+                        stroke: '#093A7C',
+                        strokeThickness: 5,
+                        wordWrap: false
+                    };  
+
+                    var richText = new PIXI.Text('Step Info', style);
+                    richText.x = windowWidth*0.040;
+                    richText.y = windowHeight*0.505;
+                    app.stage.addChild(richText);
+
+                    var pixi_steps_info_content = new PIXI.Graphics();
+                    pixi_steps_info_content.lineStyle(4, 0x093A7C, 1);
+                    pixi_steps_info_content.beginFill(0xFFFFFF);
+                    pixi_steps_info_content.drawRect(0, windowHeight*0.55, windowWidth*0.1618, windowHeight*0.8382);
+                    pixi_steps_info_content.endFill();
+                    pixi_steps_info_content.x = 0;
+                    pixi_steps_info_content.Y = 0;
+                    app.stage.addChild(pixi_steps_info_content);
+                    //-------------------------------------------------------------------------------------------------------
+                    // subgoal title and subgoal content
+                    //-------------------------------------------------------------------------------------------------------
+                    var pixi_subgoal_title = new PIXI.Graphics();
+                    pixi_subgoal_title.lineStyle(4, 0x093A7C, 1);
+                    pixi_subgoal_title.beginFill(0x8F8F8F);
+                    pixi_subgoal_title.drawRect(windowWidth*0.8382, windowHeight*0.1, windowWidth, windowHeight*0.1618);
+                    pixi_subgoal_title.endFill();
+                    pixi_subgoal_title.x = 0;
+                    pixi_subgoal_title.Y = 0;
+                    app.stage.addChild(pixi_subgoal_title);
+
+                    var style = {
+                        fontFamily: 'Arial',
+                        fontSize: windowHeight/32,
+                        fontStyle: 'italic',
+                        fontWeight: 'bold',
+                        fill: '#FFFFFF',
+                        stroke: '#093A7C',
+                        strokeThickness: 5,
+                        wordWrap: false
+                    };  
+
+                    var richText = new PIXI.Text('Subgoal', style);
+                    richText.x = windowWidth*0.884;
+                    richText.y = windowHeight*0.1125;
+                    app.stage.addChild(richText);
+
+                    var pixi_subgoal_content = new PIXI.Graphics();
+                    pixi_subgoal_content.lineStyle(4, 0x093A7C, 1);
+                    pixi_subgoal_content.beginFill(0xFFFFFF);
+                    pixi_subgoal_content.drawRect(windowWidth*0.8382, windowHeight*0.1618, windowWidth, windowHeight*0.8382);
+                    pixi_subgoal_content.endFill();
+                    pixi_subgoal_content.x = 0;
+                    pixi_subgoal_content.Y = 0;
+                    app.stage.addChild(pixi_subgoal_content);
+                    //-------------------------------------------------------------------------------------------------------
+
+                    // control ban
+                    var pixi_ctrl = new PIXI.Graphics();
+                    pixi_ctrl.lineStyle(4, 0x093A7C, 1);
+                    pixi_ctrl.beginFill(0xFFFFFF);
+                    pixi_ctrl.drawRect(windowWidth*0.1618, windowHeight*0.8382, windowWidth*0.6764, windowHeight*0.8382);
+                    pixi_ctrl.endFill();
+                    pixi_ctrl.x = 0;
+                    pixi_ctrl.Y = 0;
+                    app.stage.addChild(pixi_ctrl);
+
+                    // footer
+                    var pixi_footer = new PIXI.Graphics();
+                    pixi_footer.lineStyle(4, 0x093A7C, 1);
+                    pixi_footer.beginFill(0x093A7C);
+                    pixi_footer.drawRect(0, windowHeight*0.9382, windowWidth, windowHeight);
+                    pixi_footer.endFill();
+                    pixi_footer.x = 0;
+                    pixi_footer.y = 0;
+                    app.stage.addChild(pixi_footer)
+                }           
+                // function setup Sprite test for establish the sprites from json file
+                function setup_Sprite_test(){
+
+                    // var container = new PIXI.Sprite();
+
+                    // // pixi_steps.x = windowWidth*0.1;
+                    // // pixi_steps.Y = windowHeight*0.1;
+                    // // app.stage.addChild(pixi_steps);
+                    // var windowHeight = window.innerHeight, windowWidth = window.innerWidth;
+                    // console.log(windowWidth, windowHeight)
+                    // var bunny = PIXI.Sprite.fromImage('images/alphabet_block/block_a.png');
+                    // bunny.anchor.set(0.5); //设置原点位置
+                    // //显示精灵X轴位置
+                    // bunny.x = windowWidth / 2;
+                    // //显示精灵Y轴位置
+                    // bunny.y = windowHeight / 2;
+                    // //将显示精灵添加进舞台
+                    // container.addChild(bunny);
+
+                    // here we load the json where the backend return to the front 
+                    //.add("animals.json")
+                        
+                    // // here exist the img extract issue
+                    // for (var i=0; i<3; i++){
+
+                    //     //var j = String.fromCharCode(97+i)
+                    //     var k = imgTable_m_k[i]
+                    //     var v = imgTable_m_v[i] 
+                    //     console.log(k,v)
+                    //     k = new PIXI.Sprite(PIXI.loader.resources[v].texture);
+                    //     k.position.set(500+10*i, 500+10*i)
+                    //     app.stage.addChild(k)
+                    // }              
+
+
+                // step 0 initialize
+                var dir = {}  
+                var spriteSet = new Array()  
+                // outer loop visal stages/steps
+                for(var i=0; i < visualStages.length; i++){
+                    // if it is the initial stage 0
+                    // then initialize the page
+                   
+                    if(visualStages[i]['stageInfo'] == 'No Step Information' && visualStages[i]['stageName'] == 'Initial Stage'){
+                        if(visualStages[i]['isFinal'] == 'false'){
+                       
+                            for(var j=0; j< visualStages[i]['visualSprites'].length; j++){
+                             
+                                // for each visualsprite, check the the prefabimage in the imgtable
+                                for(var k=0; k < that.responseEvent['data']["imageTable"]["m_keys"].length; k++){
+                                    console.log("4")
+                                    msg = that.responseEvent['data']["imageTable"]["m_keys"][k]
+
+                                    console.log(msg)
+                                    console.log(visualStages[i]['visualSprites'][j]['prefabimage'])
+                             
+                                    if(visualStages[i]['visualSprites'][j]['prefabimage'] == msg){
+                                        console.log("5")
+                                        console.log(msg)
+
+                                        var img = new Image()
+                                        img.src = "data:image/png;base64," + that.responseEvent['data']["imageTable"]["m_values"][k]
+                                        const base = new PIXI.BaseTexture(img);
+                                        const texture = new PIXI.Texture(base);
+                                        const sprite = new PIXI.Sprite(texture);
+
+                                        spriteSet.push(visualStages[i]['visualSprites'][j]['name'])
+
+                                        console.log(spriteSet[j])
+                                         
+                                        spriteSet[j] = sprite
+                                        //spriteSet[j] = new PIXI.Sprite(PIXI.loader.resources[img.src]);
+
+                                        // spriteSet[j].scale.x=2
+                                        // spriteSet[j].scale.y=2
+                                    
+                                        console.log(spriteSet[j])
+                                         
+                                        spriteSet[j].position.set(ww*(visualStages[i]['visualSprites'][j]['minX'] + 0.1618 ),
+                                                                  wh*(visualStages[i]['visualSprites'][j]['minY'] + 0.1000 ))
+                                        
+
+                                        app.stage.addChild(spriteSet[j]);
+                                        console.log(spriteSet[j]+'has been added')
+                                        break
+                                    }
+                                }
+                            }
+                        }else{break}
+                    }
+                }
+
+
+                    // blocks numbers
+                    // block_length = 6
+                    // let picker = new PIXI.Sprite(PIXI.loader.resources["images/vectorgraph/icons7_picker.png"].texture);
+                    // picker.position.set(600+300+50,50+50)
+                    // app.stage.addChild(picker);
+
+                    // let table_line = new PIXI.Sprite(PIXI.loader.resources["images/vectorgraph/icons11_line_143_gray.png"].texture);
+                    // table_line.position.set(115+300+50, 675+50)
+                    // app.stage.addChild(table_line);
+
+                    // let block_a = new PIXI.Sprite(PIXI.loader.resources[img.src].texture);
+                    // block_a.position.set(position)
+                    // app.stage.addChild(block_a);
+
+                    // // dynamic object -- block
+                    
+                    // var block = new Array()
+                    // var block_name = 'block_'
+
+                    // // //var location = [[200,600],[400,600],[200,500],[400,500],[200,400],[400,400]]
+                    // for (var i=0; i<6; i++){
+                    //     var j = String.fromCharCode(97+i)
+                    //     block.push(block_name.concat(j))
+                    //     block[i] = new PIXI.Sprite(PIXI.loader.resources[images_dir[i]].texture);
+                    //     block[i].position.set(location_x[i]+300+50, location_y[i]+50)
+                    //     app.stage.addChild(block[i])
+                    // }
+                    // // console.log("visualStage")
+                    // // console.log(visualStages)
+
+                    //here extract info from json, bug need fix 
+
+
+                    // let block_a = new PIXI.Sprite(PIXI.loader.resources["images/alphabet_block/block_a.png"].texture);
+                    // block_a.position.set(200+350,600+50)
+                    // app.stage.addChild(block_a);
+
+                    // let block_b = new PIXI.Sprite(PIXI.loader.resources["images/alphabet_block/block_b.png"].texture);
+                    // block_b.position.set(400+350,600+50)
+                    // app.stage.addChild(block_b);
+                    
+                    // let block_c = new PIXI.Sprite(PIXI.loader.resources["images/alphabet_block/block_c.png"].texture);
+                    // block_c.position.set(200+350,500+50)
+                    // app.stage.addChild(block_c);
+                    
+                    // let block_d = new PIXI.Sprite(PIXI.loader.resources["images/alphabet_block/block_d.png"].texture);
+                    // block_d.position.set(400+350,500+50)
+                    // app.stage.addChild(block_d);
+                    
+                    // let block_e = new PIXI.Sprite(PIXI.loader.resources["images/alphabet_block/block_e.png"].texture);
+                    // block_e.position.set(position)
+                    // app.stage.addChild(block_e);
+                    
+                    // let block_f = new PIXI.Sprite(PIXI.loader.resources["images/alphabet_block/block_f.png"].texture);
+                    // block_f.position.set(400+350,400+50)
+                    // app.stage.addChild(block_f);
+
+                    // picker.vx = -2.88
+                    // picker.vy = 2    
+                    // let picker_grab_block = new PIXI.Container;
+                    // picker_grab_block.x = 0
+                    // picker_grab_block.y = 0
+                    // picker_grab_block.vx = 0
+                    // picker_grab_block.vy = 0
+                    // flag_grab = false
+
+                    // app.ticker.add(delta =>{
+                    //     picker.x += picker.vx
+                    //     picker.y += picker.vy
+                    //     if (hitTestRectangle(picker, block_e)) {
+                            
+                    //         picker.vx = 0 
+                    //         picker.vy = 0       
+                            
+                    //         // block_e.visible = false
+                    //         // picker.visible = false
+
+                    //         picker_grab_block.addChild(picker)
+                    //         picker_grab_block.addChild(block_e)
+                    //         app.stage.addChild(picker_grab_block)
+                            
+                    //         //current position of picker turn into the container is 0,0
+                    //         picker_grab_block.position.set(0,0)
+                    //         flag_grab = true
+                    //         console.log(picker.x, picker.y, block_e.x, block_e.y)
+                    //         console.log("grab")
+
+                    //         TweenMax.to(picker, 1 , {x:600+350, y:50+50})
+                    //         TweenMax.to(block_e, 1 , {x:600-15+350, y:50+84+50})
+
+                    //     }
+                    //     window.addEventListener("click", ()=>{
+                    //             TweenMax.to(picker, 1 , {x:600+100+15+350, y:50+465+50})
+                    //             TweenMax.to(block_e, 1 , {x:600+100+350, y:50+550+5+50})
+                    //     })
+                    //     if (hitTestRectangle(table_line, block_e)) {
+                    //         TweenMax.to(picker, 1 , {x:600+350, y:50+50})
+
+                    //     }
+      
+                    // });
+                             // if (hitTestRectangle(picker, block_e)) {
+                        //     TweenMax.to(picker, 1 , {x:600, y:50})
+                        //     TweenMax.to(block_e, 1 , {x:600-15, y:50+84})
+                        //     //If the treasure is touching the explorer, center it over the explorer
+                        //     block_e.x = picker.x + 8;
+                        //     block_e.y = picker.y + 8;
+                        // }
+                        // if (flag_grab){
+                        //     block_e.x += picker.x +200
+                        //     block_e.y += picker.y +200
+
+                        // }
+
+
+
+                        // window.addEventListener("click", ()=>{
+                        //     TweenMax.to(block_e, 1 , {x:100, y:100})
+
+                        // })
+                    
+                   
+                    //加载纹理贴图集，加载完后执行 setup 函数
+                    // let t = new Tink(PIXI,  app.view);
+                    // let buttonFrames = PIXI.loader.resources["images/button.png"].texture;
+
+                    // let playButton = t.button(buttonFrames, 32, 96);
+                    // stage.addChild(playButton);
+                    
+                    // playButton.press = () => console.log("pressed");
+                    // playButton.release = () => console.log("released");
+                    // playButton.over = () => console.log("over");
+                    // playButton.out = () => console.log("out");
+                    // playButton.tap = () => console.log("tapped");
+
+                    // import * as PIXI from '../libs/pixi'
+                    // import core from './index'
+                    // //import Button from './mybutton'
+
+                    // export default class main {
+                    //     constructor(menu,context,pos,backcall){
+                    //         //var _menu = ['选择难度'].concat(menu);
+
+                    //     this.context = context;
+                    //     this.scale = core.view.width/750;
+                    //     console.log('scale',this.scale)
+                    //     this.menucontext = new PIXI.Container();
+                    //     this.curr = 0;
+                    //     this.show = false;
+
+
+                    //     var that = this;
+                        
+
+                        
+                        
+                    //     var creatbtn = (txt)=>{
+                    //         var menucontext = new PIXI.Container();
+                    //         menucontext.name = (that.curr==0?'btn_':'drop_')+that.curr;
+                    //         menucontext.x = pos.x;
+                    //         menucontext.y = pos.y;
+                    //         var bg = new PIXI.Graphics();
+                    //         bg.beginFill(0x131227,.8);
+                    //         bg.drawRect(0,0,100*that.scale,35*that.scale);
+                    //         bg.endFill();
+                    //         bg.y = that.curr*40*that.scale;
+                    //         menucontext.addChild(bg);
+                    //         var stylecoin = {  
+                    //             fontSize: 30*that.scale,
+                    //             fill:"0xeade1a",
+                    //             fontFamily:["幼圆","Microsoft YaHei","黑体","sans-serif",],
+                    //             fontWeight: 'bold',
+                    //             letterSpacing:2
+                    //         }; 
+
+                    //         var _txt = new PIXI.Text(txt, stylecoin);
+                    //         _txt.x = (100*that.scale-_txt.width)/2;
+                    //         _txt.y = that.curr*40*that.scale;
+                    //         //return context;
+                    //         menucontext.addChild(_txt)
+                            
+
+                    //         menucontext.interactive = true;
+                    //         menucontext.visible = that.curr==0?true:that.show;
+
+                    //         menucontext.on('touchstart',(event)=>{
+                    //             //console.log(event.currentTarget.name);
+                    //             var index = parseInt(event.currentTarget.name.split('_')[1]);
+
+                    //             if(index==0){
+                    //                 that.show = !that.show;
+                    //                 that.context.children.map(i=>{
+                    //                     //console.log(i.name)
+                    //                     if(i.name&&i.name.indexOf('drop')==0){
+                    //                         i.visible = that.show;
+                    //                     }
+                    //                 })
+                    //             }else{
+                    //                 backcall(index);
+                    //             }
+                    //         })
+
+                    //         that.context.addChild(menucontext);
+                    //         that.curr++;
+
+                    //     }
+
+                    //     creatbtn('请选择')
+                    //     menu.map((i,index)=>{
+                    //         creatbtn(i)
+                    //         //context.addChild(_btn);
+                    //     })
+
+                        
+                    // }
+                    // }
+
+
+
+
+
+
+                }
+                // function of contain limit the move area
+                function contain(sprite, container) {
+
+                    let collision = undefined;
+
+                    //Left
+                    if (sprite.x < container.x) {
+                    sprite.x = container.x;
+                    collision = "left";
+                    }
+
+                    //Top
+                    if (sprite.y < container.y) {
+                    sprite.y = container.y;
+                    collision = "top";
+                    }
+
+                    //Right
+                    if (sprite.x + sprite.width > container.width) {
+                    sprite.x = container.width - sprite.width;
+                    collision = "right";
+                    }
+
+                    //Bottom
+                    if (sprite.y + sprite.height > container.height) {
+                    sprite.y = container.height - sprite.height;
+                    collision = "bottom";
+                    }
+
+                    //Return the `collision` value
+                    return collision;
+                }
+                // function of hit detect
+                function hitTestRectangle(r1, r2) {
+
+                    //Define the variables we'll need to calculate
+                    let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
+
+                    //hit will determine whether there's a collision
+                    hit = false;
+
+                    //Find the center points of each sprite
+                    r1.centerX = r1.x + r1.width / 2;
+                    r1.centerY = r1.y + r1.height / 2;
+                    r2.centerX = r2.x + r2.width / 2;
+                    r2.centerY = r2.y + r2.height / 2;
+
+                    //Find the half-widths and half-heights of each sprite
+                    r1.halfWidth = r1.width / 2;
+                    r1.halfHeight = r1.height / 2;
+                    r2.halfWidth = r2.width / 2;
+                    r2.halfHeight = r2.height / 2;
+
+                    //Calculate the distance vector between the sprites
+                    vx = r1.centerX - r2.centerX;
+                    vy = r1.centerY - r2.centerY;
+
+                    //Figure out the combined half-widths and half-heights
+                    combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+                    combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+
+                    //Check for a collision on the x axis
+                    if (Math.abs(vx) < combinedHalfWidths) {
+
+                    //A collision might be occuring. Check for a collision on the y axis
+                    if (Math.abs(vy) < combinedHalfHeights) {
+
+                        //There's definitely a collision happening
+                        hit = true;
+                    } else {
+
+                        //There's no collision on the y axis
+                        hit = false;
+                    }
+                    } else {
+
+                    //There's no collision on the x axis
+                    hit = false;
+                    }
+
+                    //`hit` will be either `true` or `false`
+                    return hit;
+                    }          
+                //function move(){}
+                function setup_Sprite(){
+
+
+                    var images_dir = 
+                    ["images/alphabet_block/block_a.png", "images/alphabet_block/block_b.png", "images/alphabet_block/block_c.png", 
+                    "images/alphabet_block/block_d.png", "images/alphabet_block/block_e.png", "images/alphabet_block/block_f.png",
+                    "images/alphabet_block/block_g.png", "images/alphabet_block/block_h.png", "images/alphabet_block/block_i.png"]
+
+                    // object location which need to be extract from json
+                    var location_x = [200, 400, 200, 400, 200, 400]
+                    var location_y = [600, 600, 500, 500, 400, 400]
+
+                    // blocks numbers
+                    block_length = 6
+
+                    PIXI.loader
+
+                        // here we load the json where the backend return to the front 
+                        //.add("animals.json")
+                        
+                        .add(["images/vectorgraph/icons7_picker.png", "images/vectorgraph/icons11_line.png", 
+                            "images/vectorgraph/icons11_line_black.png","images/vectorgraph/icons11_line_143_gray.png"])
+
+                        .add(images_dir)
+
+                        .on("progress", loadProgressHandler)
+                        //.load(setup);
+                        .load(setup_blocksworld)
+
+
+                        // PIXI.loader
+                        //     .add('spritesheet', 'required/assets/mc.json')
+                        //     .load(onAssetsLoaded);
+
+                    // fix setup o f
+
+                    function setup_blocksworld(){
+
+                        // fixed object 
+                        let picker = new PIXI.Sprite(PIXI.loader.resources["images/vectorgraph/icons7_picker.png"].texture);
+                        picker.position.set(600,50)
+                        app.stage.addChild(picker);
+
+                        let table_line = new PIXI.Sprite(PIXI.loader.resources["images/vectorgraph/icons11_line_143_gray.png"].texture);
+                        table_line.position.set(115, 675)
+                        app.stage.addChild(table_line);
+
+                        // dynamic object -- block
+                        
+                        var block = new Array()
+                        var block_name = 'block_'
+
+                        //var location = [[200,600],[400,600],[200,500],[400,500],[200,400],[400,400]]
+                        for (var i=0; i<6; i++){
+                            var j = String.fromCharCode(97+i)
+                            block.push(block_name.concat(j))
+                            block[i] = new PIXI.Sprite(PIXI.loader.resources[images_dir[i]].texture);
+                            block[i].position.set(location_x[i], location_y[i])
+                            app.stage.addChild(block[i])
+                        }
+                    }
+                    console.log(that.responseEvent['data'])
+                    console.log("1")
+
+                   
+
+
+
+
+
+
+
+                    }
+                //
+                function loadover(){
+                    let resources = PIXI.loader.resources;
+                    //let ID = resources["animals.json"].textures;
+                    //let cat = new PIXI.Sprite(ID['cat.png']);
+                    //let hedgehog = new PIXI.Sprite(ID['hedgehog.png']);
+                    //let tiger = new PIXI.Sprite(ID['tiger.png']);
+                    
+                    //let animals = new PIXI.Container;
+                    // app.stage.addChild(cat);
+                    
+                    // app.ticker.add(delta =>{
+                    //     cat.x += 0.5
+                    // });
+                    
+                    // animals.addChild(cat)
+                    // animals.addChild(hedgehog)
+                    // animals.addChild(tiger)
+
+                    // app.stage.addChild(animals);
+                    
+                    // cat.position.set(0, 0)
+                    // hedgehog.position.set(32, 32)
+                    // tiger.position.set(64, 64)
+
+                    // animals.position.set(50, 50)
+                    
+                    //catch the pixel position
+                    // console.log(animals.toGlobal(tiger));
+
+                    // console.log(tiger.getGlobalPosition());
+
+                    // console.log(cat.parent.toGlobal(cat.position));
+
+                    let rectangle = new PIXI.Graphics();
+                    rectangle.lineStyle(4, 0xFF3300, 1);
+                    rectangle.beginFill(0x66CCFF);
+                    rectangle.drawRect(0, 0, 64, 64);
+                    rectangle.endFill();
+                    rectangle.x = 170;
+                    rectangle.y = 0;
+                    app.stage.addChild(rectangle);
+                    app.stage.addChild(cat);
+                    
+                    // window.addEventListener("click", ()=>{
+                    //     TweenMax.to(cat, 1 , {x:100, y:100})
+                    // })
+
+                    app.ticker.add(delta =>{
+                        cat.x += 0.5
+                        if (hitTestRectangle(cat, rectangle)) {
+
+                            //if there's a collision, change the message text
+                            //and tint the box red
+                            console.log("hit!")
+                            rectangle.visible = false;
+                            //message.text = "hit!";
+                            //box.tint = 0xff3300;
+                            window.addEventListener("click", ()=>{
+                                TweenMax.to(cat, 1 , {x:100, y:100})
+                            })
+                            
+
+                        } else {
+
+                            //if there's no collision, reset the message
+                            //text and the box's color
+                            cat.x += 1;
+                            //message.text = "No collision...";
+                            //box.tint = 0xccff99;
+                        }
+
+                    });
+
+                    
+                    // let style = new PIXI.TextStyle({
+                    //     fontFamily: "Arial",
+                    //     fontSize: 36,
+                    //     fill: "white",
+                    //     stroke: '#ff3300',
+                    //     strokeThickness: 4,
+                    //     dropShadow: true,
+                    //     dropShadowColor: "#000000",
+                    //     dropShadowBlur: 4,
+                    //     dropShadowAngle: Math.PI / 6,
+                    //     dropShadowDistance: 6,
+                    // });
+                    // let message = new PIXI.Text("Hello Pixi!", style);
+                    // app.stage.addChild(message);
+                }                  
+            
+            
+            
+            },
+            
+            // 5. function handleChange
             handleChange(file,fileList,mode) {
                 let reader = new FileReader()
                 reader.readAsText(file.raw)
@@ -274,6 +1063,8 @@
                     this.pddlForm[mode] = fileString;
                 }
             },
+            
+            // 6. functioon beforeUploadPDDL
             beforeUploadPDDL(file) {
                 const isPDDL = file.type === 'pddl';
 
@@ -281,6 +1072,109 @@
                     this.$message.error('the file need to be in PDDL type!');
                 }
                 return isPDDL;
+            },
+            
+            // 7. demo_dog
+            demo_dog(){
+                // const app = new PIXI.Application({ width: that.v_appWi,
+                //     height: that.v_appHi,antialias: true,transparent: false,
+                //     resolution: 1});
+
+                // document.getElementById("pixi").appendChild(app.view);
+
+                // const loader = new PIXI.Loader();
+                // loader.add("../static/images/dog.jpeg").load(setup);
+
+                // function setup() {
+
+                //     let pic = new PIXI.Sprite(loader.resources["../static/images/dog.jpeg"].texture);
+
+                //     //Add the cat to the stage
+                //     app.stage.addChild(pic);
+
+                //     //If you ever need to, here's how you can clean out WebGL's GPU
+                //     //memory manually
+                //     /*
+                //     Object.keys(TextureCache).forEach(function(texture) {
+                //       TextureCache[texture].destroy(true);
+                //     });
+                //     */
+                // }
+
+
+
+                // const app = new PIXI.Application();
+                // document.body.appendChild(app.view);
+
+                // const aliens = [];
+
+                // const totalDudes = 5;
+
+                // for (let i = 0; i < totalDudes; i++) {
+                //     // create a new Sprite that uses the image name that we just generated as its source
+                //     const dude = PIXI.Sprite.from('../static/images/dog.jpeg');
+
+                //     // set the anchor point so the texture is centered on the sprite
+                //     dude.anchor.set(0.5);
+
+                //     // set a random scale for the dude - no point them all being the same size!
+                //     dude.scale.set(0.8 + Math.random() * 0.3);
+
+                //     // finally lets set the dude to be at a random position..
+                //     dude.x = Math.random() * app.screen.width;
+                //     dude.y = Math.random() * app.screen.height;
+
+                //     dude.tint = Math.random() * 0xFFFFFF;
+
+                //     // create some extra properties that will control movement :
+                //     // create a random direction in radians. This is a number between 0 and PI*2 which is the equivalent of 0 - 360 degrees
+                //     dude.direction = Math.random() * Math.PI * 2;
+
+                //     // this number will be used to modify the direction of the dude over time
+                //     dude.turningSpeed = Math.random() - 0.8;
+
+                //     // create a random speed for the dude between 2 - 4
+                //     dude.speed = 2 + Math.random() * 2;
+
+                //     // finally we push the dude into the aliens array so it it can be easily accessed later
+                //     aliens.push(dude);
+
+                //     app.stage.addChild(dude);
+                // }
+
+                // // create a bounding box for the little dudes
+                // const dudeBoundsPadding = 100;
+                // const dudeBounds = new PIXI.Rectangle(-dudeBoundsPadding,
+                //     -dudeBoundsPadding,
+                //     app.screen.width + dudeBoundsPadding * 2,
+                //     app.screen.height + dudeBoundsPadding * 2);
+
+                // app.ticker.add(() => {
+                //     // iterate through the dudes and update their position
+                //     for (let i = 0; i < aliens.length; i++) {
+                //         const dude = aliens[i];
+                //         dude.direction += dude.turningSpeed * 0.01;
+                //         dude.x += Math.sin(dude.direction) * dude.speed;
+                //         dude.y += Math.cos(dude.direction) * dude.speed;
+                //         dude.rotation = -dude.direction - Math.PI / 2;
+
+                //         // wrap the dudes by testing their bounds...
+                //         if (dude.x < dudeBounds.x) {
+                //             dude.x += dudeBounds.width;
+                //         } else if (dude.x > dudeBounds.x + dudeBounds.width) {
+                //             dude.x -= dudeBounds.width;
+                //         }
+
+                //         if (dude.y < dudeBounds.y) {
+                //             dude.y += dudeBounds.height;
+                //         } else if (dude.y > dudeBounds.y + dudeBounds.height) {
+                //             dude.y -= dudeBounds.height;
+                //         }
+                //     }
+                // });
+                // app.renderer.view.style.border = "1px dashed black";
+                // app.renderer.backgroundColor = 0x061639;
+
             }
 
         }
