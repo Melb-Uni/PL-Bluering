@@ -46,12 +46,12 @@
                 <el-row>
                     <el-col :span="8">
                         <el-upload
+                                ref="pddlUpload1"
                                 class="upload-demo"
                                 drag
                                 action=""
                                 :on-change="(file, fileList) => {handleChange(file, fileList, 'domain')}"
                                 :auto-upload = "false"
-                                :file-list="fileList"
                                 limit="1">
                             <i class="el-icon-upload"></i>
                             <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
@@ -60,12 +60,13 @@
                     </el-col>
                     <el-col :span="8">
                         <el-upload
+                                ref="pddlUpload2"
                                 class="upload-demo"
                                 drag
                                 action=""
                                 :on-change="(file, fileList) => {handleChange(file, fileList, 'problem')}"
-                                :file-list="fileList"
-                                :auto-upload = "false">
+                                :auto-upload = "false"
+                                limit="1">
                             <i class="el-icon-upload"></i>
                             <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
                             <div class="el-upload__tip" slot="tip">PROBLEM.PDDL</div>
@@ -73,35 +74,40 @@
                     </el-col>
                     <el-col :span="8">
                         <el-upload
+                                ref="pddlUpload3"
                                 class="upload-demo"
                                 drag
                                 action=""
                                 :on-change="(file, fileList) => {handleChange(file, fileList, 'anim')}"
-                                :file-list="fileList"
-                                :auto-upload = "false">
+                                :auto-upload = "false"
+                                limit="1">
                             <i class="el-icon-upload"></i>
                             <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
                             <div class="el-upload__tip" slot="tip">ANIMATION.PDDL</div>
                         </el-upload>
                     </el-col>
                 </el-row>
+
+                <el-button style="margin-left: 10px;" size="small" type="danger" @click="clearFile">clear</el-button>
                 <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">continue</el-button>
             </el-main>
             <el-header>Build Visualisation From solution VFG</el-header>
             <el-main>
                 <div>SELECT VFG FILE TO GENERATE VISUALISATION DIRECTLY.</div>
                 <el-upload
+                        ref="pddlUpload"
                         class="upload-demo"
                         drag
                         action=""
-                        :on-change="(file, fileList) => {handleChange(file, fileList, 'domain')}"
-                        :file-list="fileList"
-                        :auto-upload = "false">
+                        :on-change="(file, fileList) => {handleChange(file, fileList, 'vfg')}"
+                        :auto-upload = "false"
+                        limit="1">
                     <i class="el-icon-upload"></i>
                     <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
                     <div class="el-upload__tip" slot="tip">VFG(.vfg) file</div>
                 </el-upload>
-
+                <el-button style="margin-left: 10px;" size="small" type="danger" @click="clearFilevfg">clear</el-button>
+                <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUploadvfg">continue</el-button>
             </el-main>
         </div>
 
@@ -124,7 +130,6 @@
             v_appWi:600,
             v_appHi:400,
             pddlForm:{"domain": "","problem":"","anim":""},
-            fileList:[],
             responseEvent:{}
         },
         mounted(){
@@ -1064,7 +1069,7 @@
                 }
             },
             
-            // 6. functioon beforeUploadPDDL
+            // 6. function beforeUploadPDDL
             beforeUploadPDDL(file) {
                 const isPDDL = file.type === 'pddl';
 
@@ -1073,8 +1078,25 @@
                 }
                 return isPDDL;
             },
-            
-            // 7. demo_dog
+
+            // 7. function to clear all the files for upload
+            clearFile: function(){
+                var name = 'pddlUpload'
+                for (var i = 1;i<4;i++){
+                    this.$refs[name+i].clearFiles();
+                }
+            },
+            // 8. function to clear all the files for upload
+            clearFilevfg:function(){
+
+                this.$refs['pddlUpload'].clearFiles();
+
+            },
+            // 9. function to clear all the files for upload
+            submitUploadvfg:function(){
+
+            },
+            // 10. demo_dog
             demo_dog(){
                 // const app = new PIXI.Application({ width: that.v_appWi,
                 //     height: that.v_appHi,antialias: true,transparent: false,
