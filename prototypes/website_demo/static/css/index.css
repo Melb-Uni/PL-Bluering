@@ -17,8 +17,8 @@
     display: flex
 }
 .el-header, .el-footer {
-    background-color: #B3C0D1;
-    color: #333;
+    background-color: #093A7C;
+    color: white;
     text-align: center;
     line-height: 60px;
 }
