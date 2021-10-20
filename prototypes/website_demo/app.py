@@ -17,6 +17,9 @@ def template_test():
 def gettime():
     return time.strftime("%Y{}%m{}%d %X").format('-','-')
 
+
+'''
+example use for making other url request
 @app.route("/user",methods=["GET","POST"])
 def getuser():
     if request.method == "GET":
@@ -32,6 +35,8 @@ def uploadPDDL():
     print(request.json.get('domain'))
 
     return "post method result:"
+'''
+
 
 if __name__ == '__main__':
     app.run()
