@@ -15,6 +15,7 @@
     <script src="https://www.kkkk1000.com/js/tink.js"></script>
     <script src="https://www.kkkk1000.com/js/spriteUtilities.js"></script>
 
+
 </head>
 <body>
 <div id = "app">
@@ -130,7 +131,8 @@
             v_appWi:600,
             v_appHi:400,
             pddlForm:{"domain": "","problem":"","anim":""},
-            responseEvent:{}
+            responseEvent:{},
+            vfg:null
         },
         mounted(){
             //this.test_render();
@@ -1061,12 +1063,20 @@
             
             // 5. function handleChange
             handleChange(file,fileList,mode) {
+                var that = this;
                 let reader = new FileReader()
                 reader.readAsText(file.raw)
-                reader.onload =  (e) =>{
-                    const fileString = e.target.result;
-                    this.pddlForm[mode] = fileString;
+                if (mode =='vfg'){
+                    reader.onload =  (e) =>{
+                        that.vfg = JSON.parse(e.target.result)
+                    }
+                } else {
+                    reader.onload =  (e) =>{
+                        const fileString = e.target.result;
+                        this.pddlForm[mode] = fileString;
+                    }
                 }
+
             },
             
             // 6. function beforeUploadPDDL
