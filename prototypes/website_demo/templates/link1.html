@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <title>demo</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="../static/js/lib/vue.min.js"></script>
+    <script src="../static/js/index.js"></script>
+    <script src="../static/js/lib/pixi.min.js"></script>
+    <link rel="stylesheet" href="../static/css/index.css">
+    <script src="../static/js/lib/axios.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.8.2/pixi.min.js"></script>
+    <script src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TweenMax.min.js'></script>
+    <script src="https://www.kkkk1000.com/js/tink.js"></script>
+    <script src="https://www.kkkk1000.com/js/spriteUtilities.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    <!-- <script src="planimationLibrary.js"></script> -->
+</head>
+<body style="height: 100%;">
+<div id = "app" style="height: 100%;">
+    <el-container style="height: 100%;">
+        <div v-if="!renderAnim">
+            <el-header>Build Visualisation From Problem</el-header>
+            <el-main>
+                <div>OPTION 1-PLANNER URL </div>
+                <el-row>
+                    <el-col :span="3"><div >Enter URL：</div></el-col>
+                    <el-col :span="18">
+                        <el-input v-model="plannerURL" placeholder="please input the url"></el-input>
+                    </el-col>
+                </el-row>
+
+    <!--            <div id="testValue" v-text="value">-->
+    <!--                {{value}}-->
+    <!--            </div>-->
+                <div>OPTION 2-Upload PROBLEM, DOMAIN and ANIMATION PROFILE files </div>
+                <el-row>
+                    <el-col :span="8"><div >Domain File</div></el-col>
+                    <el-col :span="8">
+                        <div >Problem File</div>
+                    </el-col>
+                    <el-col :span="8">
+                        <div >Animation Profile</div>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="8">
+                        <el-upload
+                                class="upload-demo"
+                                drag
+                                action=""
+                                :on-change="(file, fileList) => {handleChange(file, fileList, 'domain')}"
+                                :auto-upload = "false"
+                                :file-list="fileList"
+                                limit="1">
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
+                            <div class="el-upload__tip" slot="tip">DOMAIN.PDDL</div>
+                        </el-upload>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-upload
+                                class="upload-demo"
+                                drag
+                                action=""
+                                :on-change="(file, fileList) => {handleChange(file, fileList, 'problem')}"
+                                :file-list="fileList"
+                                :auto-upload = "false">
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
+                            <div class="el-upload__tip" slot="tip">PROBLEM.PDDL</div>
+                        </el-upload>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-upload
+                                class="upload-demo"
+                                drag
+                                action=""
+                                :on-change="(file, fileList) => {handleChange(file, fileList, 'anim')}"
+                                :file-list="fileList"
+                                :auto-upload = "false">
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
+                            <div class="el-upload__tip" slot="tip">ANIMATION.PDDL</div>
+                        </el-upload>
+                    </el-col>
+                </el-row>
+                <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">continue</el-button>
+            </el-main>
+            <el-header>Build Visualisation From solution VFG</el-header>
+            <el-main>
+                <div>SELECT VFG FILE TO GENERATE VISUALISATION DIRECTLY.</div>
+                <el-upload
+                        class="upload-demo"
+                        drag
+                        action=""
+                        :on-change="(file, fileList) => {handleChange(file, fileList, 'domain')}"
+                        :file-list="fileList"
+                        :auto-upload = "false">
+                    <i class="el-icon-upload"></i>
+                    <div class="el-upload__text">drag the file here, or <em>Click to Upload</em></div>
+                    <div class="el-upload__tip" slot="tip">VFG(.vfg) file</div>
+                </el-upload>
+
+            </el-main>
+        </div>
+
+        <!-- delete ! and go back to the hidden state -->
+        <div class="mainContainer" v-if="renderAnim">
+            <div class="title">
+                <h1 class="h1">Planimation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;</h1>
+   
+                <el-dropdown>
+                    <span class="el-dropdown-link">
+                      MENU<i class="el-icon-arrow-down el-icon--right"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item @back="goBack">Homepage</el-dropdown-item>
+                      <el-dropdown-item divided>Problem</el-dropdown-item>
+                      <el-dropdown-item>VFG</el-dropdown-item>
+                      <el-dropdown-item>
+                        <a href="https://planimation.github.io/documentation/" target="_blank" rel="noreferrer">Tutorial</a>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <a href="https://www.youtube.com/watch?v=Cj2rWdt1YQU" target="_blank" rel="noreferrer">Demo Video</a>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+            </div>
+            <div class="main">
+                <div class="leftDiv">
+                    <div class="stepTitle">Steps</div>
+                    <div class="steps">
+                        <el-button type="primary" v-for="(item, i) in leftOperations"  @click="handleClickStep(item, i)">{{i}}. {{item.stageName}}</el-button>
+                    </div>
+                    <div class="stepInfoTitle">Step Info</div>
+                    <div class="stepInfo">
+                        <span class="stepinfoshow">{{leftStepInfo}}</span>
+                    </div>
+                </div>
+                <div id="pixi" style="position: relative;display: flex;" class="middleDiv">
+                </div>
+                <div class="rightDiv">
+                    <div class="subgoalTitle">Subgoal</div>
+                    <el-dropdown v-for="item in rightOperations">
+                        <span class="el-dropdown-link">
+                          {{item}}<i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                </el-dropdown>
+                </div>
+            </div>
+            <div class="btnContainer">
+                <el-button class="el-icon-video-play" @click="displayAll"></el-button>
+                <el-button class="el-icon-video-pause"></el-button>
+                <el-button class="el-icon-refresh-right" @click="refresh"></el-button>
+                <!-- <el-button class="">btn1</el-button> -->
+            </div>
+        </div>
+
+    </el-container>
+</div>
+
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data:{
+            renderAnim:false,
+            plannerURL:"http://solver.planning.domains/solve",
+            value:10,
+            v_appWi:600,
+            v_appHi:400,
+            pddlForm:{"domain": "","problem":"","anim":""},
+            fileList:[],
+            responseEvent:{},
+            leftOperations:[],
+            pixiAPP: null,
+            planimation: Object,
+            leftStepInfo:'NO Step Information',
+            rightOperations:[],
+            richText: "666"
+        },
+        mounted(){
+        },
+        
+        methods:{
+            goBack() {
+                console.log('go back');
+            },
+            handleChange(file,fileList,mode) {
+                let reader = new FileReader()
+                reader.readAsText(file.raw)
+                reader.onload =  (e) =>{
+                    const fileString = e.target.result;
+                    this.pddlForm[mode] = fileString;
+                }
+            },
+            beforeUploadPDDL(file) {
+                const isPDDL = file.type === 'pddl';
+
+                if (!isPDDL) {
+                    this.$message.error('the file need to be in PDDL type!');
+                }
+                return isPDDL;
+            },
+            displayAll(){
+                console.log('displayAll')
+                var that = this
+                var stepnum = that.responseEvent.data.visualStages.length
+                console.log(stepnum)
+                for (var i = 0; i < stepnum; i++) {
+                    temp =  that.leftOperations[i]
+                    setTimeout(this.handleClickStep(temp, i),5000)
+                }
+            },
+            refresh(){
+                var that = this
+                var stage0 = that.responseEvent.data.visualStages[0]
+                temp = that.leftOperations[0]
+                this.handleClickStep(temp, 0)
+            },
+            backstep(){
+                var that = this
+                that.planimation = this.planimation
+                
+
+
+            },
+            handleClickStep(item, i){
+        
+                console.log(i)
+                this.leftStepInfo = item.stageInfo
+                this.stageName = item.stageName
+
+                var that = this
+                var planimation = that.planimation
+                console.log(planimation)
+                this.richText = item.stageName
+                
+                that.planimation.setVS(i)
+
+            },
+    
+            submitUpload:async function(){
+                var that = this;
+                let data = new FormData();
+                data.append("domain", this.pddlForm["domain"]);
+                data.append("problem",this.pddlForm["problem"]);
+                data.append("animation",this.pddlForm["anim"]);
+                data.append("plan", "");
+                data.append("url",this.plannerURL);
+
+                const response= await axios({
+                    method:'post',
+                    url:'https://planimation.planning.domains/upload/pddl',
+                    data: data,
+                    headers:{
+                    'Content-Type': 'multipart/form-data'
+                    }
+                    })
+        
+                this.responseEvent = response
+                console.log(this.responseEvent.data)
+                this.leftOperations = this.responseEvent.data.visualStages
+                this.rightOperations = this.responseEvent.data.subgoalPool.m_keys
+                //左侧动作列
+
+                //右侧动作列
+                // that.init_pixi();
+                let domainPDDL = this.pddlForm.domain
+                let problemPDDL = this.pddlForm.problem
+                let animationPDDL = this.pddlForm.anim
+                let richText = this.richText
+
+                require(["planimationLibrary.js"], function (Planimation) {
+                    that.planimation = new Planimation(domainPDDL, problemPDDL, animationPDDL, 500, 500);
+                    document.getElementById("pixi").appendChild(that.planimation.getView());
+                    that.pixiAPP = that.planimation.getAPP()
+                });
+                
+                this.renderAnim = true
+
+            },
+            
+            // // 3. function setup_render (optional)
+            // setup_render(){
+            //     var that = this;
+            //     $(document).ready(()=>{
+
+            //     })
+            //     // renderer detected
+            //     let type = "WebGL"
+            //     if(!PIXI.utils.isWebGLSupported()){
+            //         type = "canvas"
+            //     }
+            //     PIXI.utils.sayHello(type)
+            
+            //     var pixiRender = new PIXI.autoDetectRenderer(windowWidth, windowHeight);
+            //     document.body.appendChild(pixiRender.view);
+            //     var objPixiContainer = new PIXI.Container();
+            //     pixiRender.render(objPixiContainer);
+            // },
+            
+            // // 4. functioon init_pixi mainly contains the PixiJS functions 
+            // init_pixi() {    
+
+            //     var that = this
+            //     var vfg = that.responseEvent
+            //     var imageTable = that.responseEvent['data']['imageTable']
+            //     var message = null
+            //     var subGMap_m_k  = that.responseEvent['data']['subgoalMap']['m_key']
+            //     var subGMap_m_v  = that.responseEvent['data']['subgoalMap']['m_values']
+            //     var subGPool_m_k = that.responseEvent['data']['subgoalPool']['m_key']
+            //     var subGPool_m_v = that.responseEvent['data']['subgoalPool']['m_values']
+            //     var transferType = 1
+            //     var visualStages = that.responseEvent['data']['visualStages']
+
+            //     this.$nextTick(()=>{
+            //     var element = document.getElementById('pixi')
+                
+            //     var windowHeight = document.getElementById('pixi').offsetHeight
+            //     var windowWidth = document.getElementById('pixi').offsetWidth
+            //     console.log(windowWidth, windowHeight)
+
+            //     let type = "WebGL"
+            //     if(!PIXI.utils.isWebGLSupported()){
+            //         type = "canvas"
+            //     }
+            //     PIXI.utils.sayHello(type)
+
+            //     let app = new PIXI.Application({
+            //         width: windowWidth,         // default: 800
+            //         height: windowHeight,        // default: 600
+            //         antialias: true,    // default: false
+            //         transparent: false, // default: false
+            //         resolution: 1,    // default: 1width: 256, height: 256c
+            //         backgroundColor: 0xFFFFFF,
+            //         roundPixels: true
+            //     });
+            //     function loadProgressHandler(loader, resource) {
+            //         console.log("loading: " + resource.name);
+            //         console.log("loading: " + resource.url);
+            //         console.log("progress: " + loader.progress + "%");
+            //     }
+            //     function initialize(){
+                    
+            //         var currentStage = visualStages[0].visualSprites;
+            //         console.log(currentStage)
+
+            //         var base64imgs = []
+            //         for (var i = 0; i < imageTable.m_keys.length; i++) {
+            //             var obj = {}
+            //             obj.name = imageTable.m_keys[i];
+            //             obj.url = "data:image/png;base64," + imageTable.m_values[i];
+            //             if (obj.name in PIXI.loader.resources) {
+            //                 console.log(obj.name + " already exist")
+            //             } else {
+            //                 base64imgs.push(obj)
+            //             }
+            //         }
+            //         PIXI.loader
+            //             .add(base64imgs)
+            //             .on("progress", loadProgressHandler)
+            //             .load(() => setup(currentStage));
+            //     }
+
+            //     function setup(currentStage) {
+            //         var sprites = currentStage
+            //         for (var i = 0; i < sprites.length; i++) {
+            //             if (sprites[i].showname) {
+            //                 app.stage.addChild(getSpriteWithName(sprites[i], width, height));
+            //             } else {
+            //                 app.stage.addChild(getSprite(sprites[i], width, height));
+            //             }
+            //             app.stage.children.sort((itemA, itemB) => itemA.zIndex - itemB.zIndex);
+
+            //         }
+            //         app.ticker.add(delta => play(delta, planimation));
+
+            //     }
+
+
+
+
+
+            //     element.appendChild(app.view)
+                
+
+             
+            //     PIXI.loader
+            //         .load(initialize)
+            //         .load(setup);
+            //     function setup() {
+            //     let cat = new PIXI.Sprite(base64Imgs.texture);
+            //     app.stage.addChild(cat);
+            //     }
+               
+            //     })
+                   
+            // },
+            
+    
+        }
+    })
+</script>
+
+</body>
+
+
+</html>
+<style>
+    .mainContainer{
+        width:100%;
+        height: 100%;
+    }
+    .title{
+        width: 100%;
+        height: 16%;
+        background: rgb(9, 58, 124);
+        /* color: rgb(255, 255, 255);
+        font-size: 70px;
+        font-style: italic;
+        font-weight: 700;
+        margin:auto; 
+        text-align:left; */
+    }
+    .h1{
+      
+        background: rgb(9, 58, 124);
+        color: rgb(255, 255, 255);
+        font-size: 70px;
+        font-style: italic;
+        font-weight: 700;
+        text-align:left;
+    }
+    .stepTitle{
+        width: 100%;
+        height: 60px;
+        background: rgb(192, 192, 192);
+        color: black;
+        font-size: 40px;
+        font-style: italic;
+        font-weight: 700;
+        margin:auto; 
+        text-align:center;
+    }
+    .stepInfoTitle{
+        width: 100%;
+        height: 60px; 
+        background: rgb(192, 192, 192);
+        color: black;
+        font-size: 40px;
+        font-style: italic;
+        font-weight: 700;
+        margin:auto; 
+        text-align:center;
+    }
+    .subgoalTitle{
+        width: 100%;
+        height: 60px; 
+        background: rgb(192, 192, 192);
+        color: black;
+        font-size: 40px;
+        font-style: italic;
+        font-weight: 700;
+        margin:auto; 
+        text-align:center;
+    }
+    .main{
+        display: flex;
+        width:100%;
+        height: calc(100% - 200px);
+    }
+    .leftDiv{
+        width: 250px;
+        height:100%;
+    }
+    .steps{
+        width: 100%;
+        height: 43%;
+        overflow: auto;
+    }
+    .stepInfo{
+        width: 100%;
+        height: 43%;
+        overflow: auto;
+        background: white;
+
+    }
+    .middleDiv{
+        flex:1;
+        height:100%;
+        background-color:transparent;
+    }
+    .rightDiv{
+        width: 250px;
+        height:100%;
+        background-color: white;
+    }
+    .el-dropdown-menu{
+        margin: 5px 0;
+        background-color: white;
+        border-radius: 4px;
+        width: 250px;
+    }
+    .el-dropdown{
+        margin: 5px 0;
+        background-color: white;
+        border-radius: 4px;
+        width: 250px;
+    }
+    .stepinfoshow{
+        display: inline-block;
+
+    }
+    .el-dropdown-link {
+    cursor: pointer;
+    color: #409EFF;
+    }
+    .el-icon-arrow-down {
+        font-size: 12px;
+    }
+    .btnContainer{
+        width:100%;
+        height: 200px;
+        padding: 0 30%;
+    }
+</style>
