@@ -23,3 +23,6 @@ Priyanka Shivampetha -- 1001913
     docker compose up
     ```
 - Test the web server is running by visiting `localhost:5000` in the browser.
+
+## Heroku
+`https://stormy-depths-24193.herokuapp.com/`
